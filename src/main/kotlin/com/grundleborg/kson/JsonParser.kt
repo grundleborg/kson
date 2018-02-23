@@ -5,6 +5,11 @@ class JsonParser(data: String) {
     var index = -1
 
     fun parse(): JsonValue {
+        // Skip whitespace
+        while (peek() == ' ') {
+            next()
+        }
+
         return value(next())
     }
 
@@ -40,9 +45,14 @@ class JsonParser(data: String) {
     }
 
     fun parseObject(): JsonValue {
-        val jsonObject: HashMap<JsonKey, JsonValue> = HashMap()
+        val jsonObject: HashMap<String, JsonValue> = HashMap()
 
         while(true) {
+            // Skip whitespace
+            while (peek() == ' ') {
+                next()
+            }
+
             if (peek() == '}') {
                 next()
                 break
@@ -51,7 +61,11 @@ class JsonParser(data: String) {
             next() // Should eat the opening quotes of the key.
 
             val jsonKey = parseString()
-            println(jsonKey.value)
+
+            // Skip whitespace
+            while (peek() == ' ') {
+                next()
+            }
 
             if (peek() != ':') {
                 throw Exception("Expected value after Object key. Got: "+peek())
@@ -59,8 +73,18 @@ class JsonParser(data: String) {
 
             next()
 
+            // Skip whitespace
+            while (peek() == ' ') {
+                next()
+            }
+
             val character = next()
             val jsonValue = value(character)
+
+            // Skip whitespace
+            while (peek() == ' ') {
+                next()
+            }
 
             if (peek() != ',' && peek() != '}') {
                 throw Exception("Not a comma or a end object.")
@@ -69,7 +93,7 @@ class JsonParser(data: String) {
                 next()
             }
 
-            jsonObject.put(JsonKey(jsonKey.value as String), jsonValue)
+            jsonObject.put(jsonKey.value as String, jsonValue)
         }
 
         return JsonValue(jsonObject)
@@ -79,9 +103,19 @@ class JsonParser(data: String) {
         val jsonArray: ArrayList<JsonValue> = ArrayList()
 
         while (true) {
+            // Skip whitespace
+            while (peek() == ' ') {
+                next()
+            }
+
             if (peek() == ']') {
                 next()
                 break
+            }
+
+            // Skip whitespace
+            while (peek() == ' ') {
+                next()
             }
 
             val character = next()
@@ -114,11 +148,9 @@ class JsonParser(data: String) {
     }
 
     fun parseBool(character: Char): JsonValue {
-        if (character == 't' && peek(3) == "rue") {
-            println(next(3))
+        if (character == 't' && next(3) == "rue") {
             return JsonValue(true)
-        } else if (character == 'f' && peek(4) == "alse") {
-            println(next(4))
+        } else if (character == 'f' && next(4) == "alse") {
             return JsonValue(false)
         } else {
             throw Exception("Unexpected characters in boolean value.")
