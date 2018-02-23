@@ -122,7 +122,7 @@ class JsonParser(data: String) {
     }
 
     private fun parseString(): JsonValue {
-        // TODO: Handle escapes, including unicode.
+        // TODO: Handle unicode escapes (\uXXXX)
 
         var string: String = ""
 
@@ -142,7 +142,7 @@ class JsonParser(data: String) {
                     'f' -> 0x0C.toChar()
                     '"' -> '\"'
                     '\\' -> '\\'
-                    else -> ""
+                    else -> throw Exception("Unrecognised escape sequence: `\\${escapedCharacter}`.")
                 }
             } else if (character == '"') {
                 break

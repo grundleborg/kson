@@ -44,4 +44,11 @@ class StringTests {
         val outString = output.value as String
         assertThat(outString).isEqualTo("s\bi\nm\tp\rl"+0x0C.toChar()+"e\\StringValue")
     }
+
+    @Test(expected = Exception::class)
+    fun TestInvalidEscapeSequence() {
+        val input = """"simple\zStringValue""""
+        val parser = JsonParser(input)
+        val output = parser.parse()
+    }
 }
