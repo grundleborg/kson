@@ -7,6 +7,7 @@ import org.junit.Test
 
 data class Test1(val firstParam: String, val secondParam: String = "default")
 data class Test2(val firstParam: String?, val secondParam: String? = "test")
+data class Test3(val firstParam: Int, val secondParam: Int = 10)
 data class TestList(val foo: List<Int>)
 
 class ObjectMapperBasicTests {
@@ -60,6 +61,19 @@ class ObjectMapperBasicTests {
         val t = objectMapper.map<Test2>(output, Test2::class)
         assertThat(t.firstParam).isEqualTo(null)
         assertThat(t.secondParam).isEqualTo(null)
+    }
+
+    @Test
+    fun TestExperiments4() {
+        val input = """{"firstParam": 123, "secondParam": null}"""
+        val parser = JsonParser(input)
+        val output = parser.parse()
+
+        val objectMapper = ObjectMapper()
+
+        val t = objectMapper.map<Test3>(output, Test3::class)
+        assertThat(t.firstParam).isEqualTo(123)
+        assertThat(t.secondParam).isEqualTo(10)
     }
 
     @Test
