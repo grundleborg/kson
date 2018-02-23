@@ -132,10 +132,23 @@ class JsonParser(data: String) {
 
         while (true) {
             val character = next()
-            if (character == '"') {
+            if (character == '\\') {
+                val escapedCharacter = next()
+                string += when (escapedCharacter) {
+                    'b' -> '\b'
+                    'n' -> '\n'
+                    't' -> '\t'
+                    'r' -> '\r'
+                    'f' -> 0x0C.toChar()
+                    '"' -> '\"'
+                    '\\' -> '\\'
+                    else -> ""
+                }
+            } else if (character == '"') {
                 break
+            } else {
+                string += character
             }
-            string += character
         }
 
         return JsonValue(string)
