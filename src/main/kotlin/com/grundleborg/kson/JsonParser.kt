@@ -4,12 +4,17 @@ class JsonParser(data: String) {
     val data = data
     var index = -1
 
-    fun parse(): JsonValue {
-        // Skip whitespace
-        while (peek() == ' ') {
-            next()
+    fun skipWhitespace() {
+        while (true) {
+            when (peek()) {
+                ' ', '\n', '\r', '\t' -> next()
+                else -> return
+            }
         }
+    }
 
+    fun parse(): JsonValue {
+        skipWhitespace()
         return value(next())
     }
 
@@ -48,10 +53,7 @@ class JsonParser(data: String) {
         val jsonObject: HashMap<String, JsonValue> = HashMap()
 
         while(true) {
-            // Skip whitespace
-            while (peek() == ' ') {
-                next()
-            }
+            skipWhitespace()
 
             if (peek() == '}') {
                 next()
@@ -62,10 +64,7 @@ class JsonParser(data: String) {
 
             val jsonKey = parseString()
 
-            // Skip whitespace
-            while (peek() == ' ') {
-                next()
-            }
+            skipWhitespace()
 
             if (peek() != ':') {
                 throw Exception("Expected value after Object key. Got: "+peek())
@@ -73,18 +72,12 @@ class JsonParser(data: String) {
 
             next()
 
-            // Skip whitespace
-            while (peek() == ' ') {
-                next()
-            }
+            skipWhitespace()
 
             val character = next()
             val jsonValue = value(character)
 
-            // Skip whitespace
-            while (peek() == ' ') {
-                next()
-            }
+            skipWhitespace()
 
             if (peek() != ',' && peek() != '}') {
                 throw Exception("Not a comma or a end object.")
@@ -103,20 +96,14 @@ class JsonParser(data: String) {
         val jsonArray: ArrayList<JsonValue> = ArrayList()
 
         while (true) {
-            // Skip whitespace
-            while (peek() == ' ') {
-                next()
-            }
+            skipWhitespace()
 
             if (peek() == ']') {
                 next()
                 break
             }
 
-            // Skip whitespace
-            while (peek() == ' ') {
-                next()
-            }
+            skipWhitespace()
 
             val character = next()
 
