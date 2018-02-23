@@ -51,4 +51,14 @@ class StringTests {
         val parser = JsonParser(input)
         val output = parser.parse()
     }
+
+    @Test
+    fun TestStringWithUnicodeEscapeSequences() {
+        val input = """"I live in \u9999\u6E2F.""""
+        val parser = JsonParser(input)
+        val output = parser.parse()
+
+        val outString = output.value as String
+        assertThat(outString).isEqualTo("I live in 香港.")
+    }
 }

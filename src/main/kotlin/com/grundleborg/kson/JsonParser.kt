@@ -122,9 +122,7 @@ class JsonParser(data: String) {
     }
 
     private fun parseString(): JsonValue {
-        // TODO: Handle unicode escapes (\uXXXX)
-
-        var string: String = ""
+        var builder = StringBuilder()
 
         if (next() != '"') {
             throw Exception("String must start with \" character.")
@@ -134,7 +132,7 @@ class JsonParser(data: String) {
             val character = next()
             if (character == '\\') {
                 val escapedCharacter = next()
-                string += when (escapedCharacter) {
+                builder.append(when (escapedCharacter) {
                     'b' -> '\b'
                     'n' -> '\n'
                     't' -> '\t'
@@ -142,16 +140,20 @@ class JsonParser(data: String) {
                     'f' -> 0x0C.toChar()
                     '"' -> '\"'
                     '\\' -> '\\'
-                    else -> throw Exception("Unrecognised escape sequence: `\\${escapedCharacter}`.")
-                }
+                    'u' -> {
+                        val unicode = next(4)
+                        unicode.toInt(radix=16).toChar()
+                    }
+                    else -> throw Exception("Unrecognised escape sequence: `\\$escapedCharacter`.")
+                })
             } else if (character == '"') {
                 break
             } else {
-                string += character
+                builder.append(character)
             }
         }
 
-        return JsonValue(string)
+        return JsonValue(builder.toString())
     }
 
     private fun parseTrue(): JsonValue {
