@@ -4,6 +4,35 @@ class JsonParser(data: String) {
     val data = data
     var index = -1
 
+    /**
+     * Run the parser with the data it was initialised with.
+     *
+     * @return a JsonValue representing the root element of the JSON data provided.
+     */
+    fun parse(): JsonValue {
+        skipWhitespace()
+        return parseValue()
+    }
+
+    private fun next(): Char {
+        index += 1
+        return data[index]
+    }
+
+    private fun next(n: Int): String {
+        val sub = data.substring(index+1, index+1+n)
+        index += n
+        return sub
+    }
+
+    private fun peek(): Char {
+        return data[index+1]
+    }
+
+    private fun peek(n: Int): String {
+        return data.substring(index+1, index+1+n)
+    }
+
     private fun skipWhitespace() {
         while (true) {
             when (peek()) {
@@ -13,31 +42,7 @@ class JsonParser(data: String) {
         }
     }
 
-    fun parse(): JsonValue {
-        skipWhitespace()
-        return value()
-    }
-
-    fun next(): Char {
-        index += 1
-        return data[index]
-    }
-
-    fun next(n: Int): String {
-        val sub = data.substring(index+1, index+1+n)
-        index += n
-        return sub
-    }
-
-    fun peek(): Char {
-        return data[index+1]
-    }
-
-    fun peek(n: Int): String {
-        return data.substring(index+1, index+1+n)
-    }
-
-    fun value(): JsonValue {
+    private fun parseValue(): JsonValue {
         skipWhitespace()
         val nextChar = peek()
         return when(nextChar) {
@@ -48,7 +53,7 @@ class JsonParser(data: String) {
             'f' -> parseFalse()
             'n' -> parseNull()
             '-', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' -> parseNumber()
-            else -> throw Exception("Unrecognised value: ${nextChar}")
+            else -> throw Exception("Unrecognised parseValue: ${nextChar}")
         }
     }
 
@@ -72,12 +77,12 @@ class JsonParser(data: String) {
             skipWhitespace()
 
             if (peek() != ':') {
-                throw Exception("Expected value after Object key. Got: "+peek())
+                throw Exception("Expected parseValue after Object key. Got: "+peek())
             }
 
             next()
 
-            val jsonValue = value()
+            val jsonValue = parseValue()
 
             skipWhitespace()
 
@@ -114,7 +119,7 @@ class JsonParser(data: String) {
                 continue
             }
 
-            val jsonValue = value()
+            val jsonValue = parseValue()
             jsonArray.add(jsonValue)
         }
 
@@ -122,7 +127,7 @@ class JsonParser(data: String) {
     }
 
     private fun parseString(): JsonValue {
-        var builder = StringBuilder()
+        val builder = StringBuilder()
 
         if (next() != '"') {
             throw Exception("String must start with \" character.")
@@ -185,15 +190,44 @@ class JsonParser(data: String) {
         // TODO: Handle Decimals
         // TODO: Restrict minus sign to start of string.
 
-        var accumulator: String = ""
+        val builder = StringBuilder()
+        var isExponential = false
+
         while (true) {
-            if (peek() in "-1234567890") {
-                accumulator += next()
+            val character: Char
+
+            try {
+                character = peek()
+            } catch(e: StringIndexOutOfBoundsException) {
+                break;
+            }
+
+            if (character in "-1234567890") {
+                builder.append(next())
+            } else if (character in "eE.") {
+                builder.append(next())
+                isExponential = true
             } else {
                 break;
             }
         }
 
-        return JsonValue(accumulator.toInt())
+        var result: JsonValue
+        if (isExponential) {
+            val floatResult = builder.toString().toFloat()
+            if (floatResult == Float.POSITIVE_INFINITY || floatResult == Float.NEGATIVE_INFINITY) {
+                result = JsonValue(builder.toString().toDouble())
+            } else {
+                result = JsonValue(floatResult)
+            }
+        } else {
+            try {
+                result = JsonValue(builder.toString().toInt())
+            } catch(e: NumberFormatException) {
+                result = JsonValue(builder.toString().toLong())
+            }
+        }
+
+        return result
     }
 }
