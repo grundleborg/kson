@@ -27,6 +27,8 @@ class ObjectMapper {
             if (jsonObject.containsKey(paramDef.name)) {
                 val value = jsonObject.getValue(paramDef.name!!)
 
+                val type = paramDef.type
+
                 val param = when(paramDef.type.jvmErasure) {
                     Int::class -> mapInt(value)
                     Long::class -> mapLong(value)
@@ -34,6 +36,7 @@ class ObjectMapper {
                     Double::class -> mapDouble(value)
                     Boolean::class -> mapBoolean(value)
                     String::class -> mapString(value)
+                    List::class -> mapList(value, paramDef.type.arguments[0].type!!.jvmErasure)
                     else -> mapObject(value, paramDef.type.jvmErasure)
                 }
 
@@ -46,6 +49,15 @@ class ObjectMapper {
         }
 
         return cons.callBy(paramMap)
+    }
+
+    fun <T: Any> mapList(jsonValue: JsonValue, containedCls: KClass<T>): List<T> {
+        val jsonList = jsonValue.value as List<JsonValue>
+        val outList = ArrayList<T>()
+        jsonList.forEach{
+            outList.add(map(it, containedCls))
+        }
+        return outList
     }
 
     fun mapInt(jsonValue: JsonValue): Int? {

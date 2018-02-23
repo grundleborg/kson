@@ -71,5 +71,7 @@ class ObjectMapperBasicTests {
         val objectMapper = ObjectMapper()
 
         val t = objectMapper.map<TestList>(output, TestList::class)
+        assertThat(t.foo.size).isEqualTo(4)
+        assertThat(t.foo[2]).isEqualTo(3)
     }
 }
