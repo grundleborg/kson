@@ -4,7 +4,7 @@ class JsonParser(data: String) {
     val data = data
     var index = -1
 
-    fun skipWhitespace() {
+    private fun skipWhitespace() {
         while (true) {
             when (peek()) {
                 ' ', '\n', '\r', '\t' -> next()
@@ -15,7 +15,7 @@ class JsonParser(data: String) {
 
     fun parse(): JsonValue {
         skipWhitespace()
-        return value(next())
+        return value()
     }
 
     fun next(): Char {
@@ -37,20 +37,27 @@ class JsonParser(data: String) {
         return data.substring(index+1, index+1+n)
     }
 
-    fun value(character: Char): JsonValue {
-        return when(character) {
+    fun value(): JsonValue {
+        skipWhitespace()
+        val nextChar = peek()
+        return when(nextChar) {
             '{' -> parseObject()
             '[' -> parseArray()
             '"' -> parseString()
-            't', 'f' -> parseBool(character)
+            't' -> parseTrue()
+            'f' -> parseFalse()
             'n' -> parseNull()
-            '-', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' -> parseNumber(character)
-            else -> throw Exception("Unrecognised value.")
+            '-', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' -> parseNumber()
+            else -> throw Exception("Unrecognised value: ${nextChar}")
         }
     }
 
-    fun parseObject(): JsonValue {
+    private fun parseObject(): JsonValue {
         val jsonObject: HashMap<String, JsonValue> = HashMap()
+
+        if (next() != '{') {
+            throw Exception("Object must start with { character.")
+        }
 
         while(true) {
             skipWhitespace()
@@ -59,8 +66,6 @@ class JsonParser(data: String) {
                 next()
                 break
             }
-
-            next() // Should eat the opening quotes of the key.
 
             val jsonKey = parseString()
 
@@ -72,10 +77,7 @@ class JsonParser(data: String) {
 
             next()
 
-            skipWhitespace()
-
-            val character = next()
-            val jsonValue = value(character)
+            val jsonValue = value()
 
             skipWhitespace()
 
@@ -92,8 +94,12 @@ class JsonParser(data: String) {
         return JsonValue(jsonObject)
     }
 
-    fun parseArray(): JsonValue {
+    private fun parseArray(): JsonValue {
         val jsonArray: ArrayList<JsonValue> = ArrayList()
+
+        if (next() != '[') {
+            throw Exception("Array must start with [ character.")
+        }
 
         while (true) {
             skipWhitespace()
@@ -103,25 +109,26 @@ class JsonParser(data: String) {
                 break
             }
 
-            skipWhitespace()
-
-            val character = next()
-
-            if (character == ',') {
+            if (peek() == ',') {
+                next()
                 continue
             }
 
-            val jsonValue = value(character)
+            val jsonValue = value()
             jsonArray.add(jsonValue)
         }
 
         return JsonValue(jsonArray)
     }
 
-    fun parseString(): JsonValue {
+    private fun parseString(): JsonValue {
         // TODO: Handle escapes, including unicode.
 
         var string: String = ""
+
+        if (next() != '"') {
+            throw Exception("String must start with \" character.")
+        }
 
         while (true) {
             val character = next()
@@ -134,31 +141,38 @@ class JsonParser(data: String) {
         return JsonValue(string)
     }
 
-    fun parseBool(character: Char): JsonValue {
-        if (character == 't' && next(3) == "rue") {
-            return JsonValue(true)
-        } else if (character == 'f' && next(4) == "alse") {
-            return JsonValue(false)
-        } else {
-            throw Exception("Unexpected characters in boolean value.")
+    private fun parseTrue(): JsonValue {
+        val chars = next(4)
+        return when (chars) {
+            "true" -> JsonValue(true)
+            else -> throw JsonParsingException("Boolean", "true", chars)
         }
     }
 
-    fun parseNull(): JsonValue {
-        if (next(3) != "ull") {
-            throw Exception("Unexpected characters in null value.")
+    private fun parseFalse(): JsonValue {
+        val chars = next(5)
+        return when (chars) {
+            "false" -> JsonValue(false)
+            else -> throw JsonParsingException("Boolean", "false", chars)
         }
-        return JsonValue(null)
     }
 
-    fun parseNumber(character: Char): JsonValue {
+    private fun parseNull(): JsonValue {
+        val chars = next(4)
+        return when (chars) {
+            "null" -> JsonValue(null)
+            else -> throw JsonParsingException("null", "null", chars)
+        }
+    }
+
+    private fun parseNumber(): JsonValue {
         // TODO: Handle Exponential Form
         // TODO: Handle Decimals
+        // TODO: Restrict minus sign to start of string.
 
         var accumulator: String = ""
-        accumulator += character
         while (true) {
-            if (peek() in "1234567890") {
+            if (peek() in "-1234567890") {
                 accumulator += next()
             } else {
                 break;
