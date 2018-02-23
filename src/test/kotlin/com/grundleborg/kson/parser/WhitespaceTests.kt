@@ -1,5 +1,7 @@
-package com.grundleborg.kson
+package com.grundleborg.kson.parser
 
+import com.grundleborg.kson.JsonParser
+import com.grundleborg.kson.JsonValue
 import org.assertj.core.api.Assertions
 import org.junit.Test
 

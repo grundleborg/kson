@@ -1,12 +1,14 @@
-package com.grundleborg.kson
+package com.grundleborg.kson.parser
 
+import com.grundleborg.kson.JsonParser
+import com.grundleborg.kson.JsonValue
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Test
 
 class BasicTests {
 
     @Test
-    fun TestAllTheTypes() {
+    fun TestBasic() {
         val input = """{"stringKey": "stringValue", "intKey": 12345, "boolKey": false, "nullKey": null, "listKey": [1, 2, 3, 4]}"""
         val parser = JsonParser(input)
         val output = parser.parse()
