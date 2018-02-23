@@ -186,10 +186,6 @@ class JsonParser(data: String) {
     }
 
     private fun parseNumber(): JsonValue {
-        // TODO: Handle Exponential Form
-        // TODO: Handle Decimals
-        // TODO: Restrict minus sign to start of string.
-
         val builder = StringBuilder()
         var isExponential = false
 
