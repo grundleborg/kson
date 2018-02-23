@@ -145,7 +145,7 @@ class JsonParser(data: String) {
         val chars = next(4)
         return when (chars) {
             "true" -> JsonValue(true)
-            else -> throw JsonParsingException("Boolean", "true", chars)
+            else -> throw JsonFieldParsingException("Boolean", "true", chars)
         }
     }
 
@@ -153,7 +153,7 @@ class JsonParser(data: String) {
         val chars = next(5)
         return when (chars) {
             "false" -> JsonValue(false)
-            else -> throw JsonParsingException("Boolean", "false", chars)
+            else -> throw JsonFieldParsingException("Boolean", "false", chars)
         }
     }
 
@@ -161,7 +161,7 @@ class JsonParser(data: String) {
         val chars = next(4)
         return when (chars) {
             "null" -> JsonValue(null)
-            else -> throw JsonParsingException("null", "null", chars)
+            else -> throw JsonFieldParsingException("null", "null", chars)
         }
     }
 

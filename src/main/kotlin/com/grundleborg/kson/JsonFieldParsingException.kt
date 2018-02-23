@@ -1,6 +1,6 @@
 package com.grundleborg.kson
 
-class JsonParsingException(
+class JsonFieldParsingException(
         type: String,
         expected: String,
         received: String
