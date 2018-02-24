@@ -6,6 +6,10 @@ import kotlin.reflect.full.primaryConstructor
 import kotlin.reflect.jvm.jvmErasure
 
 class ObjectMapper {
+    inline fun <reified T: Any> map(jsonValue: JsonValue): T {
+        return map(jsonValue, T::class)
+    }
+
     fun <T: Any> map(jsonValue: JsonValue, cls: KClass<T>): T {
         return when (cls) {
             Int::class -> mapInt(jsonValue) as T

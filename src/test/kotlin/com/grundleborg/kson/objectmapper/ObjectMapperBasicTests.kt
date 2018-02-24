@@ -19,7 +19,7 @@ class ObjectMapperBasicTests {
 
         val objectMapper = ObjectMapper()
 
-        val t = objectMapper.map<Test1>(output, Test1::class)
+        val t = objectMapper.map<Test1>(output)
         assertThat(t.firstParam).isEqualTo("data goes here")
         assertThat(t.secondParam).isEqualTo("default")
     }
@@ -32,7 +32,7 @@ class ObjectMapperBasicTests {
 
         val objectMapper = ObjectMapper()
 
-        val t = objectMapper.map<Test1>(output, Test1::class)
+        val t = objectMapper.map<Test1>(output)
         assertThat(t.firstParam).isEqualTo("data goes here")
         assertThat(t.secondParam).isEqualTo("default")
     }
@@ -45,7 +45,7 @@ class ObjectMapperBasicTests {
 
         val objectMapper = ObjectMapper()
 
-        val t = objectMapper.map<Test2>(output, Test2::class)
+        val t = objectMapper.map<Test2>(output)
         assertThat(t.firstParam).isEqualTo("data goes here")
         assertThat(t.secondParam).isEqualTo(null)   // Null takes precedence over default for an optional parameter.
     }
@@ -58,7 +58,7 @@ class ObjectMapperBasicTests {
 
         val objectMapper = ObjectMapper()
 
-        val t = objectMapper.map<Test2>(output, Test2::class)
+        val t = objectMapper.map<Test2>(output)
         assertThat(t.firstParam).isEqualTo(null)
         assertThat(t.secondParam).isEqualTo(null)
     }
@@ -71,7 +71,7 @@ class ObjectMapperBasicTests {
 
         val objectMapper = ObjectMapper()
 
-        val t = objectMapper.map<Test3>(output, Test3::class)
+        val t = objectMapper.map<Test3>(output)
         assertThat(t.firstParam).isEqualTo(123)
         assertThat(t.secondParam).isEqualTo(10)
     }
@@ -84,7 +84,7 @@ class ObjectMapperBasicTests {
 
         val objectMapper = ObjectMapper()
 
-        val t = objectMapper.map<TestList>(output, TestList::class)
+        val t = objectMapper.map<TestList>(output)
         assertThat(t.foo.size).isEqualTo(4)
         assertThat(t.foo[2]).isEqualTo(3)
     }
