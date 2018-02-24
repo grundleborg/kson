@@ -49,7 +49,7 @@ data class ApiResult(
 fun jsonDecode() {
     val json = """{"title": "Title", "items": [{"name": "Item 1", "number": 1},{"name": "Item 2", "number": 2}]}"""
     val om = ObjectMapper()
-    val result = om.parse(json)
+    val result = om.parse<ApiResult>(json)
 
     println("Title: ${result.title}.")
     println("Other Stuff: ${result.otherStuff}.")

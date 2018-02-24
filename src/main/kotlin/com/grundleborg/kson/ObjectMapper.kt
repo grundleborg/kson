@@ -1,11 +1,46 @@
 package com.grundleborg.kson
 
+import java.io.Reader
 import kotlin.reflect.KClass
 import kotlin.reflect.KParameter
 import kotlin.reflect.full.primaryConstructor
 import kotlin.reflect.jvm.jvmErasure
+import com.sun.xml.internal.ws.streaming.XMLStreamReaderUtil.close
+import java.lang.reflect.Type
+
 
 class ObjectMapper {
+    val typeMap: MutableMap<Type, KClass<*>> = mutableMapOf()
+
+    /**
+     * Parse a JSON string and map it to the
+     */
+    inline fun <reified T: Any> parse(json: String): T {
+        return parse(json, T::class)
+    }
+
+    inline fun <reified T: Any> parse(json: Reader): T {
+        return parse(json, T::class)
+    }
+
+    fun <T: Any> parse(json: String, cls: KClass<T>): T {
+        val parser = JsonParser(json)
+        return map(parser.parse(), cls)
+    }
+
+    fun <T: Any> parse(json: Reader, cls: KClass<T>): T {
+        val builder = StringBuilder()
+        var charsRead = -1
+        val chars = CharArray(100)
+        do {
+            charsRead = json.read(chars, 0, chars.size)
+            if (charsRead > 0)
+                builder.append(chars, 0, charsRead)
+        } while (charsRead > 0)
+        val stringReadFromReader = builder.toString()
+        return parse(stringReadFromReader, cls)
+    }
+
     inline fun <reified T: Any> map(jsonValue: JsonValue): T {
         return map(jsonValue, T::class)
     }
@@ -22,7 +57,7 @@ class ObjectMapper {
         }
     }
 
-    fun <T: Any> mapObject(jsonValue: JsonValue, cls: KClass<T>): T {
+    private fun <T: Any> mapObject(jsonValue: JsonValue, cls: KClass<T>): T {
         val cons = cls.primaryConstructor!!
         val paramMap = HashMap<KParameter, Any?>()
         val jsonObject = jsonValue.value as Map<String, JsonValue>
@@ -55,7 +90,7 @@ class ObjectMapper {
         return cons.callBy(paramMap)
     }
 
-    fun <T: Any> mapList(jsonValue: JsonValue, containedCls: KClass<T>): List<T> {
+    private fun <T: Any> mapList(jsonValue: JsonValue, containedCls: KClass<T>): List<T> {
         val jsonList = jsonValue.value as List<JsonValue>
         val outList = ArrayList<T>()
         jsonList.forEach{
@@ -64,27 +99,27 @@ class ObjectMapper {
         return outList
     }
 
-    fun mapInt(jsonValue: JsonValue): Int? {
+    private fun mapInt(jsonValue: JsonValue): Int? {
         return jsonValue.value as Int?
     }
 
-    fun mapLong(jsonValue: JsonValue): Long? {
+    private fun mapLong(jsonValue: JsonValue): Long? {
         return jsonValue.value as Long?
     }
 
-    fun mapFloat(jsonValue: JsonValue): Float? {
+    private fun mapFloat(jsonValue: JsonValue): Float? {
         return jsonValue.value as Float?
     }
 
-    fun mapDouble(jsonValue: JsonValue): Double? {
+    private fun mapDouble(jsonValue: JsonValue): Double? {
         return jsonValue.value as Double?
     }
 
-    fun mapBoolean(jsonValue: JsonValue): Boolean? {
+    private fun mapBoolean(jsonValue: JsonValue): Boolean? {
         return jsonValue.value as Boolean?
     }
 
-    fun mapString(jsonValue: JsonValue): String? {
+    private fun mapString(jsonValue: JsonValue): String? {
         return jsonValue.value as String?
     }
 }
