@@ -25,7 +25,7 @@ import java.io.StringReader
 class BasicTests {
 
     @Test
-    fun TestBasic() {
+    fun `basic json object`() {
         val input = """{"stringKey": "stringValue", "intKey": 12345, "boolKey": false, "nullKey": null, "listKey": [1, 2, 3, 4]}"""
         val parser = JsonParser(StringReader(input))
         val output = parser.parse()

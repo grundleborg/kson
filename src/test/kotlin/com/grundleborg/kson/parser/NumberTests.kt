@@ -24,7 +24,7 @@ import java.io.StringReader
 class NumberTests {
 
     @Test
-    fun TestInteger() {
+    fun `int`() {
         val input = "123"
         val parser = JsonParser(StringReader(input))
         val output = parser.parse()
@@ -34,7 +34,7 @@ class NumberTests {
     }
 
     @Test
-    fun TestFloat() {
+    fun `float`() {
         val input = "2.0E0"
         val parser = JsonParser(StringReader(input))
         val output = parser.parse()
@@ -44,7 +44,7 @@ class NumberTests {
     }
 
     @Test
-    fun TestLong() {
+    fun `long`() {
         val input = "123123123123123123"
         val parser = JsonParser(StringReader(input))
         val output = parser.parse()
@@ -54,7 +54,7 @@ class NumberTests {
     }
 
     @Test
-    fun TestDouble() {
+    fun `double`() {
         val input = "90.0E99"
         val parser = JsonParser(StringReader(input))
         val output = parser.parse()
@@ -64,7 +64,7 @@ class NumberTests {
     }
 
     @Test
-    fun TestNegativeInteger() {
+    fun `negative int`() {
         val input = "-123"
         val parser = JsonParser(StringReader(input))
         val output = parser.parse()
@@ -74,7 +74,7 @@ class NumberTests {
     }
 
     @Test
-    fun TestNegativeFloat() {
+    fun `negative float`() {
         val input = "-2.0E0"
         val parser = JsonParser(StringReader(input))
         val output = parser.parse()
@@ -84,7 +84,7 @@ class NumberTests {
     }
 
     @Test
-    fun TestNegativeLong() {
+    fun `negative long`() {
         val input = "-123123123123123123"
         val parser = JsonParser(StringReader(input))
         val output = parser.parse()
@@ -94,7 +94,7 @@ class NumberTests {
     }
 
     @Test
-    fun TestNegativeDouble() {
+    fun `negative double`() {
         val input = "-90.0E99"
         val parser = JsonParser(StringReader(input))
         val output = parser.parse()

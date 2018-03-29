@@ -25,7 +25,7 @@ import java.io.StringReader
 class WhitespaceTests {
 
     @Test
-    fun TestNoWhitespace() {
+    fun `no whitespace`() {
         val input = """{"stringKey":"stringValue","intKey":12345,"boolKey":false,"nullKey":null,"listKey":[1,2,3,4]}"""
         val parser = JsonParser(StringReader(input))
         val output = parser.parse()
@@ -50,7 +50,7 @@ class WhitespaceTests {
     }
 
     @Test
-    fun TestWithTypicalSpaces() {
+    fun `typical spaces`() {
         val input = """{"stringKey": "stringValue", "intKey": 12345, "boolKey": false, "nullKey": null, "listKey": [1, 2, 3, 4]}"""
         val parser = JsonParser(StringReader(input))
         val output = parser.parse()
@@ -75,7 +75,7 @@ class WhitespaceTests {
     }
 
     @Test
-    fun TestWithSpacesAllOverThePlace() {
+    fun `spaces all over the place`() {
         val input = """  { "stringKey"  : "stringValue" , "intKey"  : 12345 , "boolKey" : false   , "nullKey" : null  , "listKey" :   [ 1   ,  2 ,  3 , 4 ]   }  """
         val parser = JsonParser(StringReader(input))
         val output = parser.parse()
@@ -100,7 +100,7 @@ class WhitespaceTests {
     }
 
     @Test
-    fun TestWithOtherWhitespaceChars() {
+    fun `other whitespace characters`() {
         val input = """
 
               { "stringKey"         :

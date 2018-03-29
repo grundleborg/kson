@@ -24,7 +24,7 @@ import java.io.StringReader
 class StringTests {
 
     @Test
-    fun TestSimpleString() {
+    fun `simple string`() {
         val input = """"simpleStringValue""""
         val parser = JsonParser(StringReader(input))
         val output = parser.parse()
@@ -34,7 +34,7 @@ class StringTests {
     }
 
     @Test
-    fun TestStringWithSpace() {
+    fun `string with spaces`() {
         val input = """"simple String  Value""""
         val parser = JsonParser(StringReader(input))
         val output = parser.parse()
@@ -44,7 +44,7 @@ class StringTests {
     }
 
     @Test
-    fun TestStringWithEscapedDoubleQuotes() {
+    fun `string with escaped double quotes`() {
         val input = """"simpleStringValue\"""""
         val parser = JsonParser(StringReader(input))
         val output = parser.parse()
@@ -54,7 +54,7 @@ class StringTests {
     }
 
     @Test
-    fun TestStringWithOtherAsciiEscapes() {
+    fun `string with all ascii escapes`() {
         val input = """"s\bi\nm\tp\rl\fe\\StringValue""""
         val parser = JsonParser(StringReader(input))
         val output = parser.parse()
@@ -64,14 +64,14 @@ class StringTests {
     }
 
     @Test(expected = Exception::class)
-    fun TestInvalidEscapeSequence() {
+    fun `string with invalid ascii escape`() {
         val input = """"simple\zStringValue""""
         val parser = JsonParser(StringReader(input))
         val output = parser.parse()
     }
 
     @Test
-    fun TestStringWithUnicodeEscapeSequences() {
+    fun `string with unicode escapes`() {
         val input = """"I live in \u9999\u6E2F.""""
         val parser = JsonParser(StringReader(input))
         val output = parser.parse()
