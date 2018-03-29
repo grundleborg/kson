@@ -19,13 +19,14 @@ package com.grundleborg.kson.parser
 import com.grundleborg.kson.JsonParser
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Test
+import java.io.StringReader
 
 class NumberTests {
 
     @Test
     fun TestInteger() {
         val input = "123"
-        val parser = JsonParser(input)
+        val parser = JsonParser(StringReader(input))
         val output = parser.parse()
 
         val out = output.value as Int
@@ -35,7 +36,7 @@ class NumberTests {
     @Test
     fun TestFloat() {
         val input = "2.0E0"
-        val parser = JsonParser(input)
+        val parser = JsonParser(StringReader(input))
         val output = parser.parse()
 
         val out = output.value as Float
@@ -45,7 +46,7 @@ class NumberTests {
     @Test
     fun TestLong() {
         val input = "123123123123123123"
-        val parser = JsonParser(input)
+        val parser = JsonParser(StringReader(input))
         val output = parser.parse()
 
         val out = output.value as Long
@@ -55,7 +56,7 @@ class NumberTests {
     @Test
     fun TestDouble() {
         val input = "90.0E99"
-        val parser = JsonParser(input)
+        val parser = JsonParser(StringReader(input))
         val output = parser.parse()
 
         val out = output.value as Double
@@ -65,7 +66,7 @@ class NumberTests {
     @Test
     fun TestNegativeInteger() {
         val input = "-123"
-        val parser = JsonParser(input)
+        val parser = JsonParser(StringReader(input))
         val output = parser.parse()
 
         val out = output.value as Int
@@ -75,7 +76,7 @@ class NumberTests {
     @Test
     fun TestNegativeFloat() {
         val input = "-2.0E0"
-        val parser = JsonParser(input)
+        val parser = JsonParser(StringReader(input))
         val output = parser.parse()
 
         val out = output.value as Float
@@ -85,7 +86,7 @@ class NumberTests {
     @Test
     fun TestNegativeLong() {
         val input = "-123123123123123123"
-        val parser = JsonParser(input)
+        val parser = JsonParser(StringReader(input))
         val output = parser.parse()
 
         val out = output.value as Long
@@ -95,7 +96,7 @@ class NumberTests {
     @Test
     fun TestNegativeDouble() {
         val input = "-90.0E99"
-        val parser = JsonParser(input)
+        val parser = JsonParser(StringReader(input))
         val output = parser.parse()
 
         val out = output.value as Double

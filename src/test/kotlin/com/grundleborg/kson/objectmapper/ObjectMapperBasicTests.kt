@@ -20,6 +20,7 @@ import com.grundleborg.kson.JsonParser
 import com.grundleborg.kson.ObjectMapper
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Test
+import java.io.StringReader
 
 data class Test1(val firstParam: String, val secondParam: String = "default")
 data class Test2(val firstParam: String?, val secondParam: String? = "test")
@@ -30,7 +31,7 @@ class ObjectMapperBasicTests {
     @Test
     fun TestExperiments0() {
         val input = """{"firstParam": "data goes here"}"""
-        val parser = JsonParser(input)
+        val parser = JsonParser(StringReader(input))
         val output = parser.parse()
 
         val objectMapper = ObjectMapper()
@@ -43,7 +44,7 @@ class ObjectMapperBasicTests {
     @Test
     fun TestExperiments1() {
         val input = """{"firstParam": "data goes here", "secondParam": null}"""
-        val parser = JsonParser(input)
+        val parser = JsonParser(StringReader(input))
         val output = parser.parse()
 
         val objectMapper = ObjectMapper()
@@ -56,7 +57,7 @@ class ObjectMapperBasicTests {
     @Test
     fun TestExperiments2() {
         val input = """{"firstParam": "data goes here"}"""
-        val parser = JsonParser(input)
+        val parser = JsonParser(StringReader(input))
         val output = parser.parse()
 
         val objectMapper = ObjectMapper()
@@ -69,7 +70,7 @@ class ObjectMapperBasicTests {
     @Test
     fun TestExperiments3() {
         val input = """{"secondParam": null}"""
-        val parser = JsonParser(input)
+        val parser = JsonParser(StringReader(input))
         val output = parser.parse()
 
         val objectMapper = ObjectMapper()
@@ -82,7 +83,7 @@ class ObjectMapperBasicTests {
     @Test
     fun TestExperiments4() {
         val input = """{"firstParam": 123, "secondParam": null}"""
-        val parser = JsonParser(input)
+        val parser = JsonParser(StringReader(input))
         val output = parser.parse()
 
         val objectMapper = ObjectMapper()
@@ -95,7 +96,7 @@ class ObjectMapperBasicTests {
     @Test
     fun TestList() {
         val input = """{"foo": [1, 2, 3, 4]}"""
-        val parser = JsonParser(input)
+        val parser = JsonParser(StringReader(input))
         val output = parser.parse()
 
         val objectMapper = ObjectMapper()

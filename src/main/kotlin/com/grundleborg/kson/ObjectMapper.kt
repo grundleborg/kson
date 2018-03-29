@@ -17,6 +17,7 @@
 package com.grundleborg.kson
 
 import java.io.Reader
+import java.io.StringReader
 import kotlin.reflect.KClass
 import kotlin.reflect.KParameter
 import kotlin.reflect.full.primaryConstructor
@@ -24,7 +25,7 @@ import kotlin.reflect.jvm.jvmErasure
 import java.lang.reflect.Type
 
 class ObjectMapper {
-    val typeMap: MutableMap<Type, KClass<*>> = mutableMapOf()
+    private val typeMap: MutableMap<Type, KClass<*>> = mutableMapOf()
 
     /**
      * Parse a JSON string and map it to the
@@ -38,21 +39,12 @@ class ObjectMapper {
     }
 
     fun <T: Any> parse(json: String, cls: KClass<T>): T {
-        val parser = JsonParser(json)
+        val parser = JsonParser(StringReader(json))
         return map(parser.parse(), cls)
     }
 
     fun <T: Any> parse(json: Reader, cls: KClass<T>): T {
-        val builder = StringBuilder()
-        var charsRead = -1
-        val chars = CharArray(100)
-        do {
-            charsRead = json.read(chars, 0, chars.size)
-            if (charsRead > 0)
-                builder.append(chars, 0, charsRead)
-        } while (charsRead > 0)
-        val stringReadFromReader = builder.toString()
-        return parse(stringReadFromReader, cls)
+        return parse(json, cls)
     }
 
     inline fun <reified T: Any> map(jsonValue: JsonValue): T {

@@ -19,13 +19,14 @@ package com.grundleborg.kson.parser
 import com.grundleborg.kson.JsonParser
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Test
+import java.io.StringReader
 
 class StringTests {
 
     @Test
     fun TestSimpleString() {
         val input = """"simpleStringValue""""
-        val parser = JsonParser(input)
+        val parser = JsonParser(StringReader(input))
         val output = parser.parse()
 
         val outString = output.value as String
@@ -35,7 +36,7 @@ class StringTests {
     @Test
     fun TestStringWithSpace() {
         val input = """"simple String  Value""""
-        val parser = JsonParser(input)
+        val parser = JsonParser(StringReader(input))
         val output = parser.parse()
 
         val outString = output.value as String
@@ -45,7 +46,7 @@ class StringTests {
     @Test
     fun TestStringWithEscapedDoubleQuotes() {
         val input = """"simpleStringValue\"""""
-        val parser = JsonParser(input)
+        val parser = JsonParser(StringReader(input))
         val output = parser.parse()
 
         val outString = output.value as String
@@ -55,7 +56,7 @@ class StringTests {
     @Test
     fun TestStringWithOtherAsciiEscapes() {
         val input = """"s\bi\nm\tp\rl\fe\\StringValue""""
-        val parser = JsonParser(input)
+        val parser = JsonParser(StringReader(input))
         val output = parser.parse()
 
         val outString = output.value as String
@@ -65,14 +66,14 @@ class StringTests {
     @Test(expected = Exception::class)
     fun TestInvalidEscapeSequence() {
         val input = """"simple\zStringValue""""
-        val parser = JsonParser(input)
+        val parser = JsonParser(StringReader(input))
         val output = parser.parse()
     }
 
     @Test
     fun TestStringWithUnicodeEscapeSequences() {
         val input = """"I live in \u9999\u6E2F.""""
-        val parser = JsonParser(input)
+        val parser = JsonParser(StringReader(input))
         val output = parser.parse()
 
         val outString = output.value as String

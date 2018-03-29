@@ -20,13 +20,14 @@ import com.grundleborg.kson.JsonParser
 import com.grundleborg.kson.JsonValue
 import org.assertj.core.api.Assertions
 import org.junit.Test
+import java.io.StringReader
 
 class WhitespaceTests {
 
     @Test
     fun TestNoWhitespace() {
         val input = """{"stringKey":"stringValue","intKey":12345,"boolKey":false,"nullKey":null,"listKey":[1,2,3,4]}"""
-        val parser = JsonParser(input)
+        val parser = JsonParser(StringReader(input))
         val output = parser.parse()
 
         val topLevelObject = (output.value as Map<String, JsonValue>)
@@ -51,7 +52,7 @@ class WhitespaceTests {
     @Test
     fun TestWithTypicalSpaces() {
         val input = """{"stringKey": "stringValue", "intKey": 12345, "boolKey": false, "nullKey": null, "listKey": [1, 2, 3, 4]}"""
-        val parser = JsonParser(input)
+        val parser = JsonParser(StringReader(input))
         val output = parser.parse()
 
         val topLevelObject = (output.value as Map<String, JsonValue>)
@@ -76,7 +77,7 @@ class WhitespaceTests {
     @Test
     fun TestWithSpacesAllOverThePlace() {
         val input = """  { "stringKey"  : "stringValue" , "intKey"  : 12345 , "boolKey" : false   , "nullKey" : null  , "listKey" :   [ 1   ,  2 ,  3 , 4 ]   }  """
-        val parser = JsonParser(input)
+        val parser = JsonParser(StringReader(input))
         val output = parser.parse()
 
         val topLevelObject = (output.value as Map<String, JsonValue>)
@@ -109,7 +110,7 @@ class WhitespaceTests {
               ,
                3 , 4 ]   }  """
                 .trimIndent()
-        val parser = JsonParser(input)
+        val parser = JsonParser(StringReader(input))
         val output = parser.parse()
 
         val topLevelObject = (output.value as Map<String, JsonValue>)

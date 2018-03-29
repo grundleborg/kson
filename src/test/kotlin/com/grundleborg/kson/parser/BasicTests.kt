@@ -20,13 +20,14 @@ import com.grundleborg.kson.JsonParser
 import com.grundleborg.kson.JsonValue
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Test
+import java.io.StringReader
 
 class BasicTests {
 
     @Test
     fun TestBasic() {
         val input = """{"stringKey": "stringValue", "intKey": 12345, "boolKey": false, "nullKey": null, "listKey": [1, 2, 3, 4]}"""
-        val parser = JsonParser(input)
+        val parser = JsonParser(StringReader(input))
         val output = parser.parse()
 
         val topLevelObject = (output.value as Map<String, JsonValue>)

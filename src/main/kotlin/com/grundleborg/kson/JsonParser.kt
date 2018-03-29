@@ -16,9 +16,11 @@
 
 package com.grundleborg.kson
 
-class JsonParser(data: String) {
+import java.io.Reader
+
+class JsonParser(data: Reader) {
     private val data = data
-    private var index = -1
+    private var nextChar = data.read().toChar()
 
     /**
      * Run the parser with the data it was initialised with.
@@ -31,27 +33,22 @@ class JsonParser(data: String) {
     }
 
     private fun next(): Char {
-        index += 1
-        return data[index]
+        nextChar = data.read().toChar()
+        return nextChar
     }
 
     private fun next(n: Int): String {
-        val sub = data.substring(index+1, index+1+n)
-        index += n
-        return sub
-    }
-
-    private fun peek(): Char {
-        return data[index+1]
-    }
-
-    private fun peek(n: Int): String {
-        return data.substring(index+1, index+1+n)
+        val sb = StringBuilder()
+        for (i in 1..n) {
+            nextChar = data.read().toChar()
+            sb.append(nextChar)
+        }
+        return sb.toString()
     }
 
     private fun skipWhitespace() {
         while (true) {
-            when (peek()) {
+            when (nextChar) {
                 ' ', '\n', '\r', '\t' -> next()
                 else -> return
             }
@@ -59,8 +56,6 @@ class JsonParser(data: String) {
     }
 
     private fun parseValue(): JsonValue {
-        skipWhitespace()
-        val nextChar = peek()
         return when(nextChar) {
             '{' -> parseObject()
             '[' -> parseArray()
@@ -76,15 +71,11 @@ class JsonParser(data: String) {
     private fun parseObject(): JsonValue {
         val jsonObject: HashMap<String, JsonValue> = HashMap()
 
-        if (next() != '{') {
-            throw Exception("Object must start with { character.")
-        }
-
         while(true) {
+            next()
             skipWhitespace()
 
-            if (peek() == '}') {
-                next()
+            if (nextChar == '}') {
                 break
             }
 
@@ -92,52 +83,61 @@ class JsonParser(data: String) {
 
             skipWhitespace()
 
-            if (peek() != ':') {
-                throw Exception("Expected parseValue after Object key. Got: "+peek())
+            if (nextChar != ':') {
+                throw Exception("Expected parseValue after Object key. Got: "+nextChar)
             }
 
             next()
+            skipWhitespace()
 
             val jsonValue = parseValue()
 
             skipWhitespace()
 
-            if (peek() != ',' && peek() != '}') {
+            if (nextChar != ',' && nextChar != '}') {
                 throw Exception("Not a comma or a end object.")
-            }
-            if (peek() == ',') {
-                next()
             }
 
             jsonObject.put(jsonKey.value as String, jsonValue)
+
+            if (nextChar == '}') {
+                break
+            }
         }
 
         return JsonValue(jsonObject)
     }
 
     private fun parseArray(): JsonValue {
+        // FIXME: Use Kotlin style list instantiation.
         val jsonArray: ArrayList<JsonValue> = ArrayList()
 
-        if (next() != '[') {
+        if (nextChar != '[') {
             throw Exception("Array must start with [ character.")
         }
+
+        next()
 
         while (true) {
             skipWhitespace()
 
-            if (peek() == ']') {
-                next()
+            if (nextChar == ']') {
                 break
-            }
-
-            if (peek() == ',') {
-                next()
-                continue
             }
 
             val jsonValue = parseValue()
             jsonArray.add(jsonValue)
+
+            skipWhitespace()
+
+            if (nextChar == ',') {
+                next()
+            } else if (nextChar == ']') {
+                break
+            }
         }
+
+        next()
 
         return JsonValue(jsonArray)
     }
@@ -145,13 +145,13 @@ class JsonParser(data: String) {
     private fun parseString(): JsonValue {
         val builder = StringBuilder()
 
-        if (next() != '"') {
+        if (nextChar != '"') {
             throw Exception("String must start with \" character.")
         }
 
         while (true) {
-            val character = next()
-            if (character == '\\') {
+            next()
+            if (nextChar == '\\') {
                 val escapedCharacter = next()
                 builder.append(when (escapedCharacter) {
                     'b' -> '\b'
@@ -167,10 +167,11 @@ class JsonParser(data: String) {
                     }
                     else -> throw Exception("Unrecognised escape sequence: `\\$escapedCharacter`.")
                 })
-            } else if (character == '"') {
+            } else if (nextChar == '"') {
+                next()
                 break
             } else {
-                builder.append(character)
+                builder.append(nextChar)
             }
         }
 
@@ -178,25 +179,28 @@ class JsonParser(data: String) {
     }
 
     private fun parseTrue(): JsonValue {
-        val chars = next(4)
+        val chars = next(3)
+        next()
         return when (chars) {
-            "true" -> JsonValue(true)
+            "rue" -> JsonValue(true)
             else -> throw JsonFieldParsingException("Boolean", "true", chars)
         }
     }
 
     private fun parseFalse(): JsonValue {
-        val chars = next(5)
+        val chars = next(4)
+        next()
         return when (chars) {
-            "false" -> JsonValue(false)
+            "alse" -> JsonValue(false)
             else -> throw JsonFieldParsingException("Boolean", "false", chars)
         }
     }
 
     private fun parseNull(): JsonValue {
-        val chars = next(4)
+        val chars = next(3)
+        next()
         return when (chars) {
-            "null" -> JsonValue(null)
+            "ull" -> JsonValue(null)
             else -> throw JsonFieldParsingException("null", "null", chars)
         }
     }
@@ -206,22 +210,16 @@ class JsonParser(data: String) {
         var isExponential = false
 
         while (true) {
-            val character: Char
-
-            try {
-                character = peek()
-            } catch(e: StringIndexOutOfBoundsException) {
-                break;
-            }
-
-            if (character in "-1234567890") {
-                builder.append(next())
-            } else if (character in "eE.") {
-                builder.append(next())
+            if (nextChar in "-1234567890") {
+                builder.append(nextChar)
+            } else if (nextChar in "eE.") {
+                builder.append(nextChar)
                 isExponential = true
             } else {
                 break;
             }
+
+            next()
         }
 
         var result: JsonValue
