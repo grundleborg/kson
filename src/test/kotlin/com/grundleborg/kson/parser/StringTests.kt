@@ -67,7 +67,7 @@ class StringTests {
     fun `string with invalid ascii escape`() {
         val input = """"simple\zStringValue""""
         val parser = JsonParser(StringReader(input))
-        val output = parser.parse()
+        parser.parse()
     }
 
     @Test
