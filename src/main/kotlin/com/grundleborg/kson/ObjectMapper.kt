@@ -28,23 +28,88 @@ class ObjectMapper {
     private val typeMap: MutableMap<Type, KClass<*>> = mutableMapOf()
 
     /**
-     * Parse a JSON string and map it to the
+     * Parse the provided JSON data and map it into an object of the appropriate type.
+     *
+     * @param <T> The type of the object to the JSON data should be mapped into.
+     * @param json The JSON data to parse and map.
+     * @return A new instance of the requested object populated from the provided JSON data.
      */
     inline fun <reified T: Any> parse(json: String): T {
         return parse(json, T::class)
     }
 
+    /**
+     * Parse the provided JSON data and map it into an object of the appropriate type.
+     *
+     * @param <T> The type of the object to the JSON data should be mapped into.
+     * @param json The JSON data to parse and map.
+     * @return A new instance of the requested object populated from the provided JSON data.
+     */
     inline fun <reified T: Any> parse(json: Reader): T {
         return parse(json, T::class)
     }
 
+    /**
+     * Parse the provided JSON data and map it into an object of the appropriate type.
+     *
+     * @param <T> The type of the object to the JSON data should be mapped into.
+     * @param json The JSON data to parse and map.
+     * @param type The Java meta-class for the <T> type.
+     * @return A new instance of the requested object populated from the provided JSON data.
+     */
+    @Suppress("UNCHECKED_CAST")
+    fun <T: Any> parse(json: String, type: Type): T {
+        return parse(json, typeMap[type]!! as KClass<T>)
+    }
+
+    /**
+     * Parse the provided JSON data and map it into an object of the appropriate type.
+     *
+     * @param <T> The type of the object to the JSON data should be mapped into.
+     * @param json The JSON data to parse and map.
+     * @param type The Java meta-class for the <T> type.
+     * @return A new instance of the requested object populated from the provided JSON data.
+     */
+    @Suppress("UNCHECKED_CAST")
+    fun <T: Any> parse(json: Reader, type: Type): T {
+        return parse(json, typeMap[type]!! as KClass<T>)
+    }
+
+    /**
+     * Parse the provided JSON data and map it into an object of the appropriate type.
+     *
+     * @param <T> The type of the object to the JSON data should be mapped into.
+     * @param json The JSON data to parse and map.
+     * @param cls The Kotlin meta-class for the <T> type.
+     * @return A new instance of the requested object populated from the provided JSON data.
+     */
     fun <T: Any> parse(json: String, cls: KClass<T>): T {
         val parser = JsonParser(StringReader(json))
         return map(parser.parse(), cls)
     }
 
+    /**
+     * Parse the provided JSON data and map it into an object of the appropriate type.
+     *
+     * @param <T> The type of the object to the JSON data should be mapped into.
+     * @param json The JSON data to parse and map.
+     * @param cls The Kotlin meta-class for the <T> type.
+     * @return A new instance of the requested object populated from the provided JSON data.
+     */
     fun <T: Any> parse(json: Reader, cls: KClass<T>): T {
-        return parse(json, cls)
+        val parser = JsonParser(json)
+        return map(parser.parse(), cls)
+    }
+
+    /**
+     * Register a type so that it can be used as a target for JSON data mapping when identified
+     * only by it's Java Type.
+     *
+     * @param <T> The type to register.
+     * @param <cls> The Kotlin meta-class for the type <T> being registered.
+     */
+    fun <T: Any> registerType(cls: KClass<T>) {
+        typeMap[cls.java] = cls
     }
 
     inline fun <reified T: Any> map(jsonValue: JsonValue): T {

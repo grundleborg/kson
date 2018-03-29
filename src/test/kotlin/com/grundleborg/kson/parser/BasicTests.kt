@@ -48,4 +48,15 @@ class BasicTests {
         assertThat(list.get(2).value as Int == 3)
         assertThat(list.get(3).value as Int == 4)
     }
+
+    @Test
+    fun `single string object`() {
+        val input = """{"item":"value"}"""
+        val parser = JsonParser(StringReader(input))
+        val output = parser.parse()
+
+        val topLevelObject = (output.value as Map<String, JsonValue>)
+        assertThat(topLevelObject).isNotNull
+        assertThat(topLevelObject.size).isEqualTo(1)
+    }
 }
