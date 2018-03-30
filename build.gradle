@@ -64,7 +64,7 @@ install {
 
             licenses {
                 license {
-                    name 'Apache'
+                    name 'Apache-2.0'
                     url libLicenseUrl
                 }
             }
@@ -78,10 +78,12 @@ bintray {
     pkg {
         repo = groupId
         name = artifactId
-        licenses = ['Apache']
+        licenses = ['Apache-2.0']
         vcsUrl = gitUrl
         version {
-            name = version
+            name = libVersion
+            desc = 'kson ' + libVersion
+            vcsTag = 'v' + libVersion
         }
     }
     configurations = ['archives']
