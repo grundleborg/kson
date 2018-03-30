@@ -9,11 +9,25 @@ buildscript {
     }
 }
 
-group 'com.grundleborg.kson'
-version '0.0.1'
+plugins {
+    id "com.jfrog.bintray" version "1.7"
+}
 
 apply plugin: 'kotlin'
 apply plugin: 'maven'
+apply plugin: 'maven-publish'
+apply plugin: 'com.jfrog.bintray'
+
+def libGitUrl = gitUrl;
+def libWebUrl = webUrl;
+def libDescription = description;
+def libGroupId = groupId;
+def libArtifactId = artifactId;
+def libVersion = version;
+def libLicenseUrl = licenseUrl;
+
+group libGroupId
+version libVersion
 
 repositories {
     mavenCentral()
@@ -33,4 +47,42 @@ compileKotlin {
 }
 compileTestKotlin {
     kotlinOptions.jvmTarget = "1.8"
+}
+
+install {
+    repositories.mavenInstaller {
+        pom.project {
+            name libArtifactId
+            description libDescription
+            url libWebUrl
+            inceptionYear '2018'
+
+            packaging 'jar'
+            groupId libGroupId
+            artifactId libArtifactId
+            version libVersion
+
+            licenses {
+                license {
+                    name 'Apache'
+                    url libLicenseUrl
+                }
+            }
+        }
+    }
+}
+
+bintray {
+    user = bintray_user
+    key = bintray_apikey
+    pkg {
+        repo = groupId
+        name = artifactId
+        licenses = ['Apache']
+        vcsUrl = gitUrl
+        version {
+            name = version
+        }
+    }
+    configurations = ['archives']
 }
