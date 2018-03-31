@@ -26,6 +26,7 @@ import java.lang.reflect.Type
 
 class ObjectMapper {
     private val typeMap: MutableMap<Type, KClass<*>> = mutableMapOf()
+    private var nameMapper: NameMapper = SimpleNameMapper()
 
     /**
      * Parse the provided JSON data and map it into an object of the appropriate type.
@@ -112,6 +113,15 @@ class ObjectMapper {
         typeMap[cls.java] = cls
     }
 
+    /**
+     * Sets the name mapper to use for mapping between JSON keys and Kotlin properties.
+     *
+     * @param nameMapper An instance of the desired NameMapper to use.
+     */
+    fun setNameMapper(nameMapper: NameMapper) {
+        this.nameMapper = nameMapper
+    }
+
     inline fun <reified T: Any> map(jsonValue: JsonValue): T {
         return map(jsonValue, T::class)
     }
@@ -133,11 +143,10 @@ class ObjectMapper {
         val paramMap = HashMap<KParameter, Any?>()
         val jsonObject = jsonValue.value as Map<String, JsonValue>
 
+        // FIXME: Should really iterate over the Kotlin params here rather than the JSON properties.
         cons.parameters.forEachIndexed { idx, paramDef ->
-            if (jsonObject.containsKey(paramDef.name)) {
-                val value = jsonObject.getValue(paramDef.name!!)
-
-                val type = paramDef.type
+            if (jsonObject.containsKey(nameMapper.toJson(paramDef.name!!))) {
+                val value = jsonObject.getValue(nameMapper.toJson(paramDef.name!!))
 
                 val param = when(paramDef.type.jvmErasure) {
                     Int::class -> mapInt(value)
