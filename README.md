@@ -24,12 +24,17 @@ Limitations & Known Issues
 Installation
 ------------
 
-Add the following line to the `dependencies` section of your `build.gradle`:
+Add the following line to the `repositories` section of your `build.gradle`:
 
 ```groovy
-compile 'com.grundleborg.kson:kson:0.0.1'
+maven { url "https://dl.bintray.com/grundleborg/com.grundleborg.kson" }
 ```
 
+and the following line to the `dependencies` section:
+
+```groovy
+compile 'com.grundleborg.kson:kson:0.2.0'
+```
 
 Example
 -------
@@ -60,7 +65,7 @@ fun jsonDecode() {
 Contributing
 ------------
 
-* If you find a bug or missing feature, please file a ticket on the KSON Github issue tracker.
+* If you find a bug or missing feature, please file a ticket on the Github [issue tracker](https://github.com/grundleborg/kson/issues).
 * Contributions in the form of Pull Requests are also welcome, although please open an issue to discuss first if you are proposing a major change.
 
 License
