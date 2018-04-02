@@ -25,6 +25,7 @@ import java.io.StringReader
 class BasicTests {
 
     @Test
+    @Suppress("UNCHECKED_CAST")
     fun `basic json object`() {
         val input = """{"stringKey": "stringValue", "intKey": 12345, "boolKey": false, "nullKey": null, "listKey": [1, 2, 3, 4]}"""
         val parser = JsonParser(StringReader(input))
@@ -50,6 +51,7 @@ class BasicTests {
     }
 
     @Test
+    @Suppress("UNCHECKED_CAST")
     fun `single string object`() {
         val input = """{"item":"value"}"""
         val parser = JsonParser(StringReader(input))
@@ -58,5 +60,26 @@ class BasicTests {
         val topLevelObject = (output.value as Map<String, JsonValue>)
         assertThat(topLevelObject).isNotNull
         assertThat(topLevelObject.size).isEqualTo(1)
+    }
+
+    /*
+     * This tests for a bug that was fixed in 0.2.2 which meant that any fields after
+     * an inner-object weren't parsed and so were missing from the results.
+     */
+    @Test
+    @Suppress("UNCHECKED_CAST")
+    fun `check closing child objects`() {
+        val input = """{"inner_object": {"field": "value"}, "another_field": "another_value"}"""
+        val parser = JsonParser(StringReader(input))
+        val output = parser.parse()
+
+        val topLevelObject = (output.value as Map<String, JsonValue>)
+        assertThat(topLevelObject).isNotNull
+        assertThat(topLevelObject).containsKey("inner_object")
+        assertThat(topLevelObject).containsKey("another_field")
+        assertThat(topLevelObject["another_field"]!!.value as String).isEqualTo("another_value")
+
+        val innerObject = topLevelObject["inner_object"]!!.value as Map<String, JsonValue>
+        assertThat(innerObject["field"]!!.value as String).isEqualTo("value")
     }
 }

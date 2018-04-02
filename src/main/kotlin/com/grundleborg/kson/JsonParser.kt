@@ -101,6 +101,7 @@ class JsonParser(data: Reader) {
             jsonObject.put(jsonKey.value as String, jsonValue)
 
             if (nextChar == '}') {
+                next()
                 break
             }
         }
