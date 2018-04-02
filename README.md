@@ -33,7 +33,7 @@ maven { url "https://dl.bintray.com/grundleborg/com.grundleborg.kson" }
 and the following line to the `dependencies` section:
 
 ```groovy
-compile 'com.grundleborg.kson:kson:0.2.0'
+compile 'com.grundleborg.kson:kson:0.2.1'
 ```
 
 Example
