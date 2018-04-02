@@ -16,6 +16,7 @@
 
 package com.grundleborg.kson
 
+import com.grundleborg.kson.annotations.JsonName
 import java.io.Reader
 import java.io.StringReader
 import kotlin.reflect.KClass
@@ -23,6 +24,7 @@ import kotlin.reflect.KParameter
 import kotlin.reflect.full.primaryConstructor
 import kotlin.reflect.jvm.jvmErasure
 import java.lang.reflect.Type
+import kotlin.reflect.full.findAnnotation
 
 class ObjectMapper {
     private val typeMap: MutableMap<Type, KClass<*>> = mutableMapOf()
@@ -143,27 +145,48 @@ class ObjectMapper {
         val paramMap = HashMap<KParameter, Any?>()
         val jsonObject = jsonValue.value as Map<String, JsonValue>
 
-        // FIXME: Should really iterate over the Kotlin params here rather than the JSON properties.
-        cons.parameters.forEachIndexed { idx, paramDef ->
-            if (jsonObject.containsKey(nameMapper.toJson(paramDef.name!!))) {
-                val value = jsonObject.getValue(nameMapper.toJson(paramDef.name!!))
 
+        jsonObject.entries.map {
+            val paramName = nameMapper.fromJson(it.key)
+
+            cons.parameters.forEach { paramDef ->
+                if (paramDef.name == null) {
+                    return@forEach
+                }
+
+                val paramDefName = paramDef.name!!
+                val serializedNameAnnotation = paramDef.findAnnotation<JsonName>()
+
+                // Check if this parameter is the one for this JSON property.
+                if (serializedNameAnnotation == null || serializedNameAnnotation.name != paramName) {
+                    if (paramDefName != paramName) {
+                        return@forEach
+                    }
+                }
+
+                // This is the right class parameter, populate it with the appropriate value.
                 val param = when(paramDef.type.jvmErasure) {
-                    Int::class -> mapInt(value)
-                    Long::class -> mapLong(value)
-                    Float::class -> mapFloat(value)
-                    Double::class -> mapDouble(value)
-                    Boolean::class -> mapBoolean(value)
-                    String::class -> mapString(value)
-                    List::class -> mapList(value, paramDef.type.arguments[0].type!!.jvmErasure)
-                    else -> mapObject(value, paramDef.type.jvmErasure)
+                    Int::class -> mapInt(it.value)
+                    Long::class -> mapLong(it.value)
+                    Float::class -> mapFloat(it.value)
+                    Double::class -> mapDouble(it.value)
+                    Boolean::class -> mapBoolean(it.value)
+                    String::class -> mapString(it.value)
+                    List::class -> mapList(it.value, paramDef.type.arguments[0].type!!.jvmErasure)
+                    else -> mapObject(it.value, paramDef.type.jvmErasure)
                 }
 
                 if (paramDef.type.isMarkedNullable || param != null) {
                     paramMap[paramDef] = param
                 }
-            } else if (paramDef.type.isMarkedNullable) {
-                paramMap[paramDef] = null
+            }
+        }
+
+        cons.parameters.forEach { paramDef ->
+            if (!paramMap.containsKey(paramDef)) {
+                if (paramDef.type.isMarkedNullable) {
+                    paramMap[paramDef] = null
+                }
             }
         }
 
