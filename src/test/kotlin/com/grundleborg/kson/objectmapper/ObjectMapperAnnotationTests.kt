@@ -38,4 +38,26 @@ class ObjectMapperAnnotationTests {
         Assertions.assertThat(t.field).isEqualTo("contents 1")
         Assertions.assertThat(t.anotherField).isEqualTo("contents 2")
     }
+
+    internal data class JsonNameNullableTestData(
+            @JsonName("nullable_custom_name") val differentName: String?
+    ) {
+        val nullableCustomName: String?
+            get() {
+                return "property with clashing name"
+            }
+    }
+
+    @Test
+    fun `map with JsonName annotation to nullable property`() {
+        val input = """{"nullable_custom_name": "some value"}"""
+
+        val objectMapper = ObjectMapper()
+        val t = objectMapper.parse<JsonNameNullableTestData>(input)
+
+        Assertions.assertThat(t.differentName).isEqualTo("some value")
+        Assertions.assertThat(t.nullableCustomName).isEqualTo("property with clashing name")
+    }
+
+
 }
