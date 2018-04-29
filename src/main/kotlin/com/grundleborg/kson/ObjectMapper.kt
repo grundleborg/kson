@@ -24,10 +24,12 @@ import kotlin.reflect.KParameter
 import kotlin.reflect.full.primaryConstructor
 import kotlin.reflect.jvm.jvmErasure
 import java.lang.reflect.Type
+import kotlin.reflect.KFunction
 import kotlin.reflect.full.findAnnotation
 
 class ObjectMapper {
     private val typeMap: MutableMap<Type, KClass<*>> = mutableMapOf()
+    private val constructorMap: MutableMap<KClass<*>, KFunction<Any>> = mutableMapOf()
     private var nameMapper: NameMapper = SimpleNameMapper()
 
     /**
@@ -141,7 +143,11 @@ class ObjectMapper {
     }
 
     private fun <T: Any> mapObject(jsonValue: JsonValue, cls: KClass<T>): T {
-        val cons = cls.primaryConstructor!!
+        val cons = if (constructorMap.containsKey(cls)) constructorMap[cls]!! as KFunction<T> else {
+            constructorMap[cls] = cls.primaryConstructor!!
+            constructorMap[cls]!! as KFunction<T>
+        }
+
         val paramMap = HashMap<KParameter, Any?>()
         val jsonObject = jsonValue.value as Map<String, JsonValue>
 
