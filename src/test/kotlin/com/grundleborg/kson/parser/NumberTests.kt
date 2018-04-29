@@ -64,6 +64,36 @@ class NumberTests {
     }
 
     @Test
+    fun `decimal`() {
+        val input = "8489666.094580958"
+        val parser = JsonParser(StringReader(input))
+        val output = parser.parse()
+
+        val out = output.value as Float
+        assertThat(out).isEqualTo(8489666.0f)
+    }
+
+    @Test
+    fun `positive exponent sign`() {
+        val input = "8.489666094580958e+06"
+        val parser = JsonParser(StringReader(input))
+        val output = parser.parse()
+
+        val out = output.value as Float
+        assertThat(out).isEqualTo(8489666.0f)
+    }
+
+    @Test
+    fun `negative exponent sign`() {
+        val input = "8.489666094580958e-06"
+        val parser = JsonParser(StringReader(input))
+        val output = parser.parse()
+
+        val out = output.value as Float
+        assertThat(out).isEqualTo(8.4896665e-6f)
+    }
+
+    @Test
     fun `negative int`() {
         val input = "-123"
         val parser = JsonParser(StringReader(input))
@@ -101,5 +131,15 @@ class NumberTests {
 
         val out = output.value as Double
         assertThat(out).isEqualTo(-90.0E99)
+    }
+
+    @Test
+    fun `negative decimal`() {
+        val input = "-8489666.094580958"
+        val parser = JsonParser(StringReader(input))
+        val output = parser.parse()
+
+        val out = output.value as Float
+        assertThat(out).isEqualTo(-8489666.0f)
     }
 }

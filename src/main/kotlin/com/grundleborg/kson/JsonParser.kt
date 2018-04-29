@@ -211,7 +211,7 @@ class JsonParser(data: Reader) {
         var isExponential = false
 
         while (true) {
-            if (nextChar in "-1234567890") {
+            if (nextChar in "+-1234567890") {
                 builder.append(nextChar)
             } else if (nextChar in "eE.") {
                 builder.append(nextChar)
