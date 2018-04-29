@@ -147,7 +147,8 @@ class ObjectMapper {
 
 
         jsonObject.entries.map {
-            val paramName = nameMapper.fromJson(it.key)
+            val unmappedParamName = it.key
+            val mappedParamName = nameMapper.fromJson(it.key)
 
             cons.parameters.forEach { paramDef ->
                 if (paramDef.name == null) {
@@ -158,8 +159,8 @@ class ObjectMapper {
                 val serializedNameAnnotation = paramDef.findAnnotation<JsonName>()
 
                 // Check if this parameter is the one for this JSON property.
-                if (serializedNameAnnotation == null || serializedNameAnnotation.name != paramName) {
-                    if (paramDefName != paramName) {
+                if (serializedNameAnnotation == null || serializedNameAnnotation.name != unmappedParamName) {
+                    if (paramDefName != mappedParamName) {
                         return@forEach
                     }
                 }

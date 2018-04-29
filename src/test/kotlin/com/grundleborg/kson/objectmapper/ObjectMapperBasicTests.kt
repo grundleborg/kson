@@ -22,12 +22,12 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.Test
 import java.io.StringReader
 
-data class Test1(val firstParam: String, val secondParam: String = "default")
-data class Test2(val firstParam: String?, val secondParam: String? = "test")
-data class Test3(val firstParam: Int, val secondParam: Int = 10)
-data class TestList(val foo: List<Int>)
-
 class ObjectMapperBasicTests {
+    data class Test1(val firstParam: String, val secondParam: String = "default")
+    data class Test2(val firstParam: String?, val secondParam: String? = "test")
+    data class Test3(val firstParam: Int, val secondParam: Int = 10)
+    data class TestList(val foo: List<Int>)
+
     @Test
     fun TestExperiments0() {
         val input = """{"firstParam": "data goes here"}"""

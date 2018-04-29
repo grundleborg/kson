@@ -17,6 +17,7 @@
 package com.grundleborg.kson.objectmapper
 
 import com.grundleborg.kson.ObjectMapper
+import com.grundleborg.kson.UnderscoreCamelCaseNameMapper
 import com.grundleborg.kson.annotations.JsonName
 import org.assertj.core.api.Assertions
 import org.junit.Test
@@ -59,5 +60,15 @@ class ObjectMapperAnnotationTests {
         Assertions.assertThat(t.nullableCustomName).isEqualTo("property with clashing name")
     }
 
+    @Test
+    fun `map with JsonName annotation and UnderscoreCamalCaseNameMapper`() {
+        val input = """{"nullable_custom_name": "some value"}"""
 
+        val objectMapper = ObjectMapper()
+        objectMapper.setNameMapper(UnderscoreCamelCaseNameMapper())
+        val t = objectMapper.parse<JsonNameNullableTestData>(input)
+
+        Assertions.assertThat(t.differentName).isEqualTo("some value")
+        Assertions.assertThat(t.nullableCustomName).isEqualTo("property with clashing name")
+    }
 }
