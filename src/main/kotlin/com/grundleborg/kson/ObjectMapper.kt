@@ -208,15 +208,27 @@ class ObjectMapper {
     }
 
     private fun mapLong(jsonValue: JsonValue): Long? {
-        return jsonValue.value as Long?
+        return when (jsonValue.value) {
+            is Int -> jsonValue.value.toLong()
+            else -> jsonValue.value as Long?
+        }
     }
 
     private fun mapFloat(jsonValue: JsonValue): Float? {
-        return jsonValue.value as Float?
+        return when (jsonValue.value) {
+            is Int -> jsonValue.value.toFloat()
+            is Long -> jsonValue.value.toFloat()
+            else -> jsonValue.value as Float?
+        }
     }
 
     private fun mapDouble(jsonValue: JsonValue): Double? {
-        return jsonValue.value as Double?
+        return when (jsonValue.value) {
+            is Int -> jsonValue.value.toDouble()
+            is Long -> jsonValue.value.toDouble()
+            is Float -> jsonValue.value.toDouble()
+            else -> jsonValue.value as Double?
+        }
     }
 
     private fun mapBoolean(jsonValue: JsonValue): Boolean? {
